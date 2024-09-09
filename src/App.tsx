@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 function App() {
   const [map, setMap] = useState();
   const [address, setAddress] = useState();
+  const [instructions, setInstructions] = useState<any[]>([]);
+
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -48,7 +50,12 @@ function App() {
     }
   }
 
-
+  const locationDirection = () => {
+    axios.post('http://localhost:3000/direction/driving')
+      .then(response => {
+        console.log(response.data);
+      })
+  }
 
   return (
     <div className={css`
@@ -59,6 +66,7 @@ function App() {
         display: flex;
         align-items: center;
         justify-content: center;
+        margin-top: 98px;
       `}>
         <h2>아세테크 요금 계산기</h2>
         <button className={css`
@@ -76,12 +84,28 @@ function App() {
 
       <p className={css`
           text-align: left;
-      `}>{address}</p>
+      `}>현재 위치: {address}</p>
+
+      <input className={css`
+        width: 820px;
+        height: 32px;
+        padding-left: 8px;
+      `} 
+      type='text'
+      placeholder="도착지 주소를 입력해주세요." />
+
+      <button className={css`
+        width: 242px;
+        height: 36px;
+        margin-left: 8px;
+      `} onClick={() => locationDirection()}>
+        정보 조회
+      </button>
 
       <div className={css`
         width: 1080px;
         height: 620px;
-        margin: 0 auto;`} ref={mapRef} />
+        margin: 30px auto 0 auto;`} ref={mapRef} />
     </div>
   )
 };
