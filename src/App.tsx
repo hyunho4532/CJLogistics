@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 
 function App() {
   const [map, setMap] = useState();
-  const [address, setAddress] = useState();
-  const [instructions, setInstructions] = useState<any[]>([]);
+  const [address, setAddress] = useState<any[]>([]);
+  const [location, setLocation] = useState<any[]>([]);
+  const [locationDirections, setLocationDirections] = useState([]); 
 
   const mapRef = useRef(null);
 
@@ -24,6 +25,8 @@ function App() {
         (position) => {
           const { latitude, longitude } = position.coords;
 
+          setLocation([latitude, longitude]);
+
           const currentLocationMarker = new window.naver.maps.Marker({
             position: new naver.maps.LatLng(latitude, longitude),
             map: map
@@ -34,8 +37,6 @@ function App() {
             longitude: longitude
           })
             .then(response => {
-              console.log(response.data.results[0])
-
               setAddress(
                 response.data.results[0].region.area1.name +
                 response.data.results[0].region.area2.name +
@@ -51,9 +52,11 @@ function App() {
   }
 
   const locationDirection = () => {
-    axios.post('http://localhost:3000/direction/driving')
+    axios.post('http://localhost:3000/direction/driving', {
+      location: location  
+    })
       .then(response => {
-        console.log(response.data);
+        setLocationDirections(response.data.route.traoptimal[0].summary);
       })
   }
 
@@ -63,10 +66,6 @@ function App() {
       margin: 0 auto;
     `}>
       <div className={css`
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 98px;
       `}>
         <h2>아세테크 요금 계산기</h2>
         <button className={css`
@@ -103,9 +102,34 @@ function App() {
       </button>
 
       <div className={css`
+        position: relative;
         width: 1080px;
         height: 620px;
-        margin: 30px auto 0 auto;`} ref={mapRef} />
+        margin: 30px auto 0 auto;
+      `}>
+        <div className={css`
+          width: 100%;
+          height: 100%;
+        `} ref={mapRef} />
+
+        <div className={css`
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          background-color: white;
+          width: 240px;
+          height: 80px;
+        `}>
+          <p>톨게이트: {locationDirections.tollFare}원</p>
+          <p>택시 비용: {locationDirections.taxiFare}원</p>
+        </div>
+      </div>
+
+      <div className={css`
+        margin-bottom: 120px;
+      `}>
+        ddds
+      </div>
     </div>
   )
 };

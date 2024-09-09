@@ -13,8 +13,6 @@ app.post("/reverse/geocode", async (req, res) => {
     const latitude = req.body.latitude;
     const longitude = req.body.longitude;
 
-    console.log(latitude, longitude);
-
     try {
         const response = await axios.get('https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc', {
           headers: {
@@ -34,21 +32,24 @@ app.post("/reverse/geocode", async (req, res) => {
 })
 
 app.post('/direction/driving', async (req, res) => {
-    try {
-        const response = await axios.get('https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving', {
-          headers: {
-            'X-NCP-APIGW-API-KEY-ID': '6dqjmlyppv',
-            'X-NCP-APIGW-API-KEY': 'BRR4QIDkcd9Ilj2uos8MNv214t7a5dJioSZ3HZXc'
-          },
-          params: {
-            start: `127.1365699,37.3977992`,
-            goal: '129.075986,35.179470'
-          }
-        });
-        res.json(response.data);
-      } catch (error) {
-        res.status(500).json({ error: 'Error fetching data from Naver API' });
-      }
+
+  const location = req.body.location;
+
+  try {
+      const response = await axios.get('https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving', {
+        headers: {
+          'X-NCP-APIGW-API-KEY-ID': '6dqjmlyppv',
+          'X-NCP-APIGW-API-KEY': 'BRR4QIDkcd9Ilj2uos8MNv214t7a5dJioSZ3HZXc'
+        },
+        params: {
+          start: `${location[1]},${location[0]}`,
+          goal: '129.075986,35.179470'
+        }
+      });
+      res.json(response.data);
+    } catch (error) {
+      res.status(500).json({ error: 'Error fetching data from Naver API' });
+    }
 });
 
 app.listen(3000, (req, res) => {
