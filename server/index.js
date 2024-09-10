@@ -34,6 +34,7 @@ app.post("/reverse/geocode", async (req, res) => {
 app.post('/direction/driving', async (req, res) => {
 
   const location = req.body.location;
+  const position = req.body.locationPosition;
 
   try {
       const response = await axios.get('https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving', {
@@ -43,7 +44,7 @@ app.post('/direction/driving', async (req, res) => {
         },
         params: {
           start: `${location[1]},${location[0]}`,
-          goal: '129.075986,35.179470'
+          goal: `${position._lng},${position._lat}`
         }
       });
       res.json(response.data);

@@ -1,15 +1,19 @@
 import { css } from '@emotion/css';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
+import { InfoCard } from './components/card/InfoCard';
 
 function App() {
-  const [map, setMap] = useState();
+  const [map, setMap] = useState<any>();
+  const [marker, setMarker] = useState(null);
   const [address, setAddress] = useState<any[]>([]);
   const [location, setLocation] = useState<any[]>([]);
   const [locationDirections, setLocationDirections] = useState({
     location: [],
     popup: false
   }); 
+
+  const [locationPosition, setLocationPosition] = useState<any[]>([]);
 
   const mapRef = useRef(null);
 
@@ -35,8 +39,8 @@ function App() {
           })
 
           axios.post("http://localhost:3000/reverse/geocode", { 
-            latitude: latitude,
-            longitude: longitude
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
           })
             .then(response => {
               setAddress(
@@ -53,9 +57,33 @@ function App() {
     }
   }
 
+  const addMarkerAtCenter = () => {
+    if (!map) return;
+
+    const markerElement = document.createElement('div');
+    markerElement.className = css`
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -100%);
+      width: 60px;
+      height: 60px;
+      background-image: url('public/marker.png');
+      background-size: cover;
+    `;
+
+    document.body.appendChild(markerElement);
+
+    window.naver.maps.Event.addListener(map, 'bounds_changed', () => {
+      const center = map.getCenter();
+      setLocationPosition(center);
+    });
+  }
+
   const locationDirection = () => {
     axios.post('http://localhost:3000/direction/driving', {
-      location: location  
+      location: location,
+      locationPosition: locationPosition
     })
       .then(response => {
         setLocationDirections({
@@ -84,7 +112,7 @@ function App() {
           width: 160px;
           height: 40px;
           margin-left: 16px;
-        `}>위치 지정하기</button>
+        `} onClick={() => addMarkerAtCenter()}>위치 지정하기</button>
       </div>
 
       <p className={css`
@@ -119,17 +147,7 @@ function App() {
         `} ref={mapRef} />
 
         { locationDirections.popup && 
-          <div className={css`
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: white;
-            width: 240px;
-            height: 80px;
-          `}>
-            <p>톨게이트: {locationDirections.location.tollFare}원</p>
-            <p>택시 비용: {locationDirections.location.taxiFare}원</p>
-          </div>
+          <InfoCard locationDirections={locationDirections} />
         }
       </div>
     </div>
