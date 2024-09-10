@@ -64,7 +64,7 @@ function App() {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(0%, 50%);
+      transform: translate(-60%, 240%);
       width: 60px;
       height: 60px;
       background-image: url('public/marker.png');
@@ -85,6 +85,15 @@ function App() {
       locationPosition: locationPosition
     })
       .then(response => {
+        const routePath = response.data.route.traoptimal[0].path.map((coord: any) => 
+          new naver.maps.LatLng(coord[1], coord[0])
+        );
+
+        const polyline = new window.naver.maps.Polyline({
+          map: map,
+          path: routePath
+        })
+
         setLocationDirections({
           location: response.data.route.traoptimal[0].summary, 
           popup: true
