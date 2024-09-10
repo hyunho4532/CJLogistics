@@ -5,7 +5,6 @@ import { InfoCard } from './components/card/InfoCard';
 
 function App() {
   const [map, setMap] = useState<any>();
-  const [marker, setMarker] = useState(null);
   const [address, setAddress] = useState<any[]>([]);
   const [location, setLocation] = useState<any[]>([]);
   const [locationDirections, setLocationDirections] = useState({
@@ -65,7 +64,7 @@ function App() {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -100%);
+      transform: translate(0%, 50%);
       width: 60px;
       height: 60px;
       background-image: url('public/marker.png');
@@ -106,12 +105,18 @@ function App() {
           width: 160px;
           height: 40px;
           margin-left: 16px;
+          background-color: #9999FF;
+          border: 1px solid white;
+          color: white;
         `} onClick={() => currentLocation()}>현재 위치 가져오기</button>
         
         <button className={css`
           width: 160px;
           height: 40px;
           margin-left: 16px;
+          background-color: #9999FF;
+          border: 1px solid white;
+          color: white;
         `} onClick={() => addMarkerAtCenter()}>위치 지정하기</button>
       </div>
 
@@ -131,6 +136,9 @@ function App() {
         width: 242px;
         height: 36px;
         margin-left: 8px;
+        background-color: #9999FF;
+        border: 1px solid white;
+        color: white;
       `} onClick={() => locationDirection()}>
         정보 조회
       </button>
