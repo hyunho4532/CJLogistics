@@ -2,6 +2,7 @@ import { css } from '@emotion/css';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { InfoCard } from './components/card/InfoCard';
+import { createMarker } from './features';
 
 function App() {
   const [map, setMap] = useState<any>();
@@ -57,19 +58,8 @@ function App() {
   }
 
   const addMarkerAtCenter = () => {
-    if (!map) return;
-
     const markerElement = document.createElement('div');
-    markerElement.className = css`
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-60%, 240%);
-      width: 60px;
-      height: 60px;
-      background-image: url('public/marker.png');
-      background-size: cover;
-    `;
+    createMarker(markerElement);
 
     document.body.appendChild(markerElement);
 
@@ -107,50 +97,58 @@ function App() {
       margin: 0 auto;
     `}>
       <div className={css`
-        margin-top: 160px;
+        margin-top: 190px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        justify-items: center;
       `}>
         <h2>아세테크 요금 계산기</h2>
-        <button className={css`
-          width: 160px;
-          height: 40px;
-          margin-left: 16px;
-          background-color: #9999FF;
-          border: 1px solid white;
-          color: white;
-        `} onClick={() => currentLocation()}>현재 위치 가져오기</button>
-        
-        <button className={css`
-          width: 160px;
-          height: 40px;
-          margin-left: 16px;
-          background-color: #9999FF;
-          border: 1px solid white;
-          color: white;
-        `} onClick={() => addMarkerAtCenter()}>위치 지정하기</button>
       </div>
 
       <p className={css`
           text-align: left;
+          margin-top: 46px;
       `}>현재 위치: {address}</p>
 
-      <input className={css`
-        width: 820px;
-        height: 32px;
-        padding-left: 8px;
-      `} 
-      type='text'
-      placeholder="도착지 주소를 입력해주세요." />
+      <div className={css`
+        display: flex;  
+      `}>
+        <input className={css`
+          width: 460px;
+          height: 32px;
+          padding-left: 8px;
+        `} 
+        type='text'
+        placeholder="출발지 입력하세요."
+        value={address} />
+      </div>
 
-      <button className={css`
-        width: 242px;
-        height: 36px;
-        margin-left: 8px;
-        background-color: #9999FF;
-        border: 1px solid white;
-        color: white;
-      `} onClick={() => locationDirection()}>
-        정보 조회
-      </button>
+      <div className={css`
+        display: flex;
+      `}>
+        <input className={css`
+          width: 460px;
+          height: 32px;
+          padding-left: 8px;
+          margin-top: 8px;
+        `} 
+          type='text'
+          placeholder="도착지 입력하세요." />
+      
+        <button className={css`
+            width: 242px;
+            height: 36px;
+            margin-left: 8px;
+            margin-top: 8px;
+            background-color: #9999FF;
+            border: 1px solid white;
+            color: white;
+          `} onClick={() => locationDirection()}>
+            정보 조회
+        </button>
+      </div>
+
 
       <div className={css`
         position: relative;
@@ -163,7 +161,30 @@ function App() {
           height: 100%;
         `} ref={mapRef} />
 
-        { locationDirections.popup && 
+        <button className={css`
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          background-color: white;
+          margin-left: 180px;
+          width: 160px;
+          height: 40px;
+          border-radius: 32px;
+          font-weight: bold;
+        `} onClick={() => currentLocation()}>현재 위치 가져오기</button>
+
+        <button className={css`
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: white;
+            width: 160px;
+            height: 40px;
+            border-radius: 32px;
+            font-weight: bold;
+        `} onClick={() => addMarkerAtCenter()}>위치 지정하기</button>
+
+        { locationDirections.popup &&
           <InfoCard locationDirections={locationDirections} />
         }
       </div>
