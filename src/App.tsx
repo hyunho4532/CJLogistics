@@ -6,7 +6,10 @@ function App() {
   const [map, setMap] = useState();
   const [address, setAddress] = useState<any[]>([]);
   const [location, setLocation] = useState<any[]>([]);
-  const [locationDirections, setLocationDirections] = useState([]); 
+  const [locationDirections, setLocationDirections] = useState({
+    location: [],
+    popup: false
+  }); 
 
   const mapRef = useRef(null);
 
@@ -23,12 +26,11 @@ function App() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const { latitude, longitude } = position.coords;
 
-          setLocation([latitude, longitude]);
+          setLocation([position.coords.latitude, position.coords.longitude]);
 
           const currentLocationMarker = new window.naver.maps.Marker({
-            position: new naver.maps.LatLng(latitude, longitude),
+            position: new naver.maps.LatLng(position.coords.latitude, position.coords.longitude),
             map: map
           })
 
@@ -56,7 +58,10 @@ function App() {
       location: location  
     })
       .then(response => {
-        setLocationDirections(response.data.route.traoptimal[0].summary);
+        setLocationDirections({
+          location: response.data.route.traoptimal[0].summary, 
+          popup: true
+        });
       })
   }
 
@@ -66,6 +71,7 @@ function App() {
       margin: 0 auto;
     `}>
       <div className={css`
+        margin-top: 160px;
       `}>
         <h2>아세테크 요금 계산기</h2>
         <button className={css`
@@ -112,23 +118,19 @@ function App() {
           height: 100%;
         `} ref={mapRef} />
 
-        <div className={css`
-          position: absolute;
-          top: 20px;
-          right: 20px;
-          background-color: white;
-          width: 240px;
-          height: 80px;
-        `}>
-          <p>톨게이트: {locationDirections.tollFare}원</p>
-          <p>택시 비용: {locationDirections.taxiFare}원</p>
-        </div>
-      </div>
-
-      <div className={css`
-        margin-bottom: 120px;
-      `}>
-        ddds
+        { locationDirections.popup && 
+          <div className={css`
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            width: 240px;
+            height: 80px;
+          `}>
+            <p>톨게이트: {locationDirections.location.tollFare}원</p>
+            <p>택시 비용: {locationDirections.location.taxiFare}원</p>
+          </div>
+        }
       </div>
     </div>
   )
