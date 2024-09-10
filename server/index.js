@@ -31,6 +31,27 @@ app.post("/reverse/geocode", async (req, res) => {
       }
 })
 
+app.post('/map/geocode', async (req, res) => {
+
+  const startAddress = req.body.startAddress;
+
+  try {
+    const response = await axios.get('https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode', {
+      headers: {
+        'X-NCP-APIGW-API-KEY-ID': '6dqjmlyppv',
+        'X-NCP-APIGW-API-KEY': 'BRR4QIDkcd9Ilj2uos8MNv214t7a5dJioSZ3HZXc'
+      },
+      params: {
+        query: startAddress
+      }
+    });
+    
+    return res.json(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+})
+
 app.post('/direction/driving', async (req, res) => {
 
   const location = req.body.location;

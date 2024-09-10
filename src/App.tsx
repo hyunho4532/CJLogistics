@@ -8,6 +8,9 @@ function App() {
   const [map, setMap] = useState<any>();
   const [address, setAddress] = useState<any[]>([]);
   const [location, setLocation] = useState<any[]>([]);
+  const [startAddress, setStartAddress] = useState<any[]>([]);
+  const [lastAddress, setLastAddress] = useState<any[]>([]);
+
   const [locationDirections, setLocationDirections] = useState({
     location: [],
     popup: false
@@ -70,25 +73,50 @@ function App() {
   }
 
   const locationDirection = () => {
-    axios.post('http://localhost:3000/direction/driving', {
-      location: location,
-      locationPosition: locationPosition
-    })
-      .then(response => {
-        const routePath = response.data.route.traoptimal[0].path.map((coord: any) => 
-          new naver.maps.LatLng(coord[1], coord[0])
-        );
 
-        const polyline = new window.naver.maps.Polyline({
-          map: map,
-          path: routePath
-        })
+    console.log(startAddress);
 
-        setLocationDirections({
-          location: response.data.route.traoptimal[0].summary, 
-          popup: true
-        });
+    if (startAddress != null) {
+      axios.post('http://localhost:3000/map/geocode', {
+        startAddress: startAddress
       })
+        .then(response => {
+          console.log(response.data);
+        })
+    } else {
+      axios.post('http://localhost:3000/direction/driving', {
+        location: location,
+        locationPosition: locationPosition
+      })
+        .then(response => {
+          const routePath = response.data.route.traoptimal[0].path.map((coord: any) => 
+            new naver.maps.LatLng(coord[1], coord[0])
+          );
+  
+          const polyline = new window.naver.maps.Polyline({
+            map: map,
+            path: routePath
+          })
+  
+          setLocationDirections({
+            location: response.data.route.traoptimal[0].summary, 
+            popup: true
+          });
+        })
+    }
+  }
+
+  const onChange = (e: any, key: string) => {
+    switch(key) {
+      case "startAddress": {
+        setStartAddress(e.target.value);
+        break;
+      };
+      case "lastAddress": {
+        setLastAddress(e.target.value);
+        break;
+      };
+    }
   }
 
   return (
@@ -121,7 +149,7 @@ function App() {
         `} 
         type='text'
         placeholder="출발지 입력하세요."
-        value={address} />
+        onChange={(addr) => onChange(addr, "startAddress")} />
       </div>
 
       <div className={css`
@@ -134,6 +162,7 @@ function App() {
           margin-top: 8px;
         `} 
           type='text'
+          onChange={(addr) => onChange(addr, "lastAddress")}
           placeholder="도착지 입력하세요." />
       
         <button className={css`
